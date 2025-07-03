@@ -5,7 +5,7 @@ import bcrypt from "bcryptjs";
 export async function registerUser(req,res){
     try {
         const { name,email,password } = req.body;
-        if(!name.trim() || !email.trim() || !password ){
+        if(!name.trim() || !email.trim() || !password.trim() ){
             return res.status(400).json({success:false, message:"all fields are required"});
         }
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -25,17 +25,21 @@ export async function registerUser(req,res){
 }
 
 export async function login(req,res) {
-    const {email,password} = req.body;
-    if(!email.trim() || !password ){
-        return res.status(400).json({success:false, message:"all fields are required"});
+    try {
+        const {email,password} = req.body;
+        if(!email.trim() || !password.trim() ){
+            return res.status(400).json({success:false, message:"all fields are required"});
+        }
+        const user = await User.findOne({email});
+        if(!user){
+            return res.status(400).json({success:false, message:"user with email not exist"})
+        }
+        if(!bcrypt.compare(user.password,password)){
+            return res.status(400).json({success:false, message:"Invalid credentials"})
+        }
+        generateAndSetCookie(res,user._id);
+        return res.json({success:true, message:"login successful"});
+    } catch (error) {
+        return res.status(500).json({success:false, message:error.message})
     }
-    const user = await User.findOne({email});
-    if(!user){
-        return res.status(400).json({success:false, message:"user with email not exist"})
-    }
-    if(!bcrypt.compare(user.password,password)){
-        return res.status(400).json({success:false, message:"Invalid credentials"})
-    }
-    generateAndSetCookie(res,user._id);
-    return res.json({success:true, message:"login successful"});
 }

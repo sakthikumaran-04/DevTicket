@@ -3,6 +3,8 @@ import userRouter from "./routes/user.route.js";
 import dotenv from "dotenv";
 import { connectToDB } from "./utils/utils.js";
 import cookieParser from "cookie-parser";
+import projectRouter from "./routes/project.route.js";
+import ticketRouter from "./routes/ticket.route.js";
 
 dotenv.config();
 
@@ -15,6 +17,8 @@ app.get("/",(req,res)=>{
 })
 
 app.use("/api/user",userRouter);
+app.use("/api/projects",projectRouter);
+app.use("/api/tickets",ticketRouter);
 
 app.listen(port,async ()=>{
     await connectToDB();

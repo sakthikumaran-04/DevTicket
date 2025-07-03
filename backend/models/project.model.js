@@ -1,6 +1,10 @@
 import mongoose from "mongoose";
 
 const projectSchema = new mongoose.Schema({
+    code:{
+        type:String,
+        required:[true,"project must have a code"]
+    },
     name:{
         type:String,
         required:[true,"project must have a name"]
